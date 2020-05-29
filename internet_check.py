@@ -18,7 +18,6 @@ def main():
     index = -1
     while True:
         index = (index + 1) % SPEED_CHECK_STEP
-        print(index)
         time.sleep(INTERVAL_STEP)
         has_connection = connection_status.loop()
         if index == 0:
