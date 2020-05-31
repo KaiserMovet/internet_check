@@ -17,10 +17,13 @@ class SpeedStatus():
         pass
 
     def speed_status(self):
-        results_dict = self._speed_test()
+        try:
+            results_dict = self._speed_test()
+        except:
+            self.push_empty_entry()
+            return
         entry = self._generate_entry(results_dict)
         self._save_info(entry)
-        pass
 
     def _save_info(self, text):
         with open(self.log_file, 'a') as file:
