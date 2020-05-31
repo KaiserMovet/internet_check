@@ -6,7 +6,7 @@ from connection_status import ConnectionStatus
 
 TARGET_ADDRESS = "http://google.com"
 INTERVAL_STEP = 300
-SPEED_CHECK_STEP = 12
+SPEED_CHECK_STEP = 3
 LOG_FILE = 'log.txt'
 SPEED_LOG_FILE = 'speed_log.txt'
 
