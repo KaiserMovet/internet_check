@@ -17,14 +17,15 @@ def main():
     speed_status = SpeedStatus(SPEED_LOG_FILE)
     index = -1
     while True:
+        current_time = datetime.now()
         index = (index + 1) % SPEED_CHECK_STEP
         time.sleep(INTERVAL_STEP)
-        has_connection = connection_status.loop()
+        has_connection = connection_status.loop(current_time)
         if index == 0:
             if has_connection:
-                speed_status.speed_status()
+                speed_status.speed_status(current_time)
             else:
-                speed_status.push_empty_entry()
+                speed_status.push_empty_entry(current_time)
 
 
 if __name__ == "__main__":

@@ -23,12 +23,11 @@ class ConnectionStatus():
             self.last_status, self.last_time)
         self._save_info(entry)
 
-    def loop(self):
+    def loop(self, current_time):
         """
         return connection status
         """
         current_status = self._check_connection()
-        current_time = datetime.now()
         entry = self._generate_entry(
             self.last_status, current_time)
         self._update_info(entry)

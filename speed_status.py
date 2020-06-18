@@ -10,19 +10,19 @@ class SpeedStatus():
         self.log_file = log_file
         pass
 
-    def push_empty_entry(self):
+    def push_empty_entry(self, current_time):
         results_dict = {"download": 0, "upload": 0}
-        entry = self._generate_entry(results_dict)
+        entry = self._generate_entry(results_dict, current_time)
         self._save_info(entry)
         pass
 
-    def speed_status(self):
+    def speed_status(self, current_time):
         try:
             results_dict = self._speed_test()
         except:
             self.push_empty_entry()
             return
-        entry = self._generate_entry(results_dict)
+        entry = self._generate_entry(results_dict, current_time)
         self._save_info(entry)
 
     def _save_info(self, text):
@@ -30,8 +30,8 @@ class SpeedStatus():
             file.writelines([F'{text}\n'])
 
     @classmethod
-    def _generate_entry(cls, results):
-        time_log = datetime.now().strftime(cls.TIME_STR)
+    def _generate_entry(cls, results, current_time):
+        time_log = current_time.strftime(cls.TIME_STR)
         # download speed in megabits
         download = round(results["download"] / 1000000, 1)
         # upload speed in megabits
