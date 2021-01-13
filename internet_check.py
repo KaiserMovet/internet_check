@@ -1,7 +1,7 @@
 import time
 from datetime import datetime
 from speed_status import SpeedStatus, SpeedStatusObj
-from connection_status import ConnectionStatus
+from connection_status import ConnectionStatus, ConnectionStatusObj
 from internet_speed_cleen import InternetSpeedClean
 from database import DataBase
 import sys
@@ -36,21 +36,35 @@ def clean():
 
 def load_from_file():
     db = DataBase()
-    file_name = sys.argv[2]
+    load_type = sys.argv[2]
+    file_name = sys.argv[3]
     obj_to_save = []
     with open(file_name, 'r') as f:
         lines = f.readlines()
-    for line in lines:
-        if not line:
-            continue
-        splitted_lines = line.split()
-        download = float(splitted_lines[3])
-        upload = float(splitted_lines[4])
-        date_str = " ".join(splitted_lines[0:3])[1:-1]
-        date = datetime.strptime(
-            date_str, '%Y.%m.%d - %H:%M:%S')
-        obj_to_save.append(SpeedStatusObj(date, upload, download))
-    db.save_multiple(obj_to_save)
+
+    if load_type == "speed":
+        for line in lines:
+            if not line:
+                continue
+            splitted_lines = line.split()
+            download = float(splitted_lines[3])
+            upload = float(splitted_lines[4])
+            date_str = " ".join(splitted_lines[0:3])[1:-1]
+            date = datetime.strptime(
+                date_str, '%Y.%m.%d - %H:%M:%S')
+            obj_to_save.append(SpeedStatusObj(date, upload, download))
+        db.save_multiple(obj_to_save)
+
+    elif load_type == "status":
+        for line in lines:
+            if not line:
+                continue
+            splitted_lines = line.split()
+            date_str = " ".join(splitted_lines[0:3])[1:-1]
+            date = datetime.strptime(
+                date_str, '%Y.%m.%d - %H:%M:%S')
+            status = bool("no" in line)
+            obj_to_save.append(ConnectionStatusObj(date, status))
 
 
 def main():
