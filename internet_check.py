@@ -2,7 +2,9 @@ import time
 from datetime import datetime
 from speed_status import SpeedStatus, SpeedStatusObj
 from connection_status import ConnectionStatus, ConnectionStatusObj
-from internet_speed_cleen import InternetSpeedClean
+from internet_speed_clean import InternetSpeedClean
+from internet_status_clean import InternetStatusClean
+
 from database import DataBase
 import sys
 
@@ -30,7 +32,9 @@ def loop():
 
 def clean():
     db = DataBase()
-    cleaner = InternetSpeedClean(db)
+    # cleaner = InternetSpeedClean(db)
+    # cleaner.clean()
+    cleaner = InternetStatusClean(db)
     cleaner.clean()
 
 

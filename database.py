@@ -89,7 +89,16 @@ class DataBase:
             obj_list.append(SpeedStatusObj(*r[1:], r[0]))
         return obj_list
 
+    def getAllConnectionStatus(self):
+        sql = F"SELECT * from {ConnectionStatusObj.DATABASE_NAME} "\
+              F"ORDER BY {ConnectionStatusObj.FIELDS[0]}"
+        res = self._execute_sql([[sql]])
+        obj_list = []
+        for r in res:
+            obj_list.append(ConnectionStatusObj(*r[1:], r[0]))
+        return obj_list
+
     def delete_all(self, database_name):
-        sql = F"DELETE  from {SpeedStatusObj.DATABASE_NAME} "
-        sql2 = F"ALTER TABLE {SpeedStatusObj.DATABASE_NAME} AUTO_INCREMENT = 1"
+        sql = F"DELETE  from {database_name} "
+        sql2 = F"ALTER TABLE {database_name} AUTO_INCREMENT = 1"
         self._execute_sql([[sql], [sql2]])
