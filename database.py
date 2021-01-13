@@ -91,4 +91,5 @@ class DataBase:
 
     def delete_all(self, database_name):
         sql = F"DELETE  from {SpeedStatusObj.DATABASE_NAME} "
-        self._execute_sql([[sql]])
+        sql2 = F"ALTER TABLE {SpeedStatusObj.DATABASE_NAME} AUTO_INCREMENT = 1"
+        self._execute_sql([[sql], [sql2]])
