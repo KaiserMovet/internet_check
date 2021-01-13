@@ -63,7 +63,7 @@ def load_from_file():
             date_str = " ".join(splitted_lines[0:3])[1:-1]
             date = datetime.strptime(
                 date_str, '%Y.%m.%d - %H:%M:%S')
-            status = bool("no" in line)
+            status = bool("no" not in line)
             obj_to_save.append(ConnectionStatusObj(date, status))
         db.save_multiple(obj_to_save)
 
