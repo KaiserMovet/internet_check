@@ -2,19 +2,35 @@ from datetime import datetime
 import speedtest
 
 
+class SpeedStatusObj():
+    DATABASE_NAME = 'internet_check_internetspeed'
+    FIELDS = ['date', 'upload', 'download']
+
+    def __init__(self, date, upload, download, id=None):
+        self.date = date
+        self.upload = round(upload, 1)
+        self.download = round(download, 1)
+        self.id = id
+
+    def get_tuple(self):
+        return (self.date.strftime("%Y-%m-%d - %H:%M:%S"), self.upload,
+                self.download)
+
+    def __repr__(self):
+        return F"ConnectionSpeed<{self.id}, {self.date}, {self.upload}, {self.download}>"
+
+
 class SpeedStatus():
 
     TIME_STR = "%Y.%m.%d - %H:%M:%S"
 
-    def __init__(self, log_file):
-        self.log_file = log_file
+    def __init__(self, db):
+        self.db = db
         pass
 
     def push_empty_entry(self, current_time):
-        results_dict = {"download": 0, "upload": 0}
-        entry = self._generate_entry(results_dict, current_time)
+        entry = SpeedStatusObj(current_time, 0, 0)
         self._save_info(entry)
-        pass
 
     def speed_status(self, current_time):
         try:
@@ -25,19 +41,18 @@ class SpeedStatus():
         entry = self._generate_entry(results_dict, current_time)
         self._save_info(entry)
 
-    def _save_info(self, text):
-        with open(self.log_file, 'a') as file:
-            file.writelines([F'{text}\n'])
+    def _save_info(self, entry):
+        self.db.save(entry)
 
-    @classmethod
-    def _generate_entry(cls, results, current_time):
-        time_log = current_time.strftime(cls.TIME_STR)
+    @staticmethod
+    def _generate_entry(results, current_time):
+
         # download speed in megabits
         download = round(results["download"] / 1000000, 1)
         # upload speed in megabits
         upload = round(results["upload"] / 1000000, 1)
 
-        return F"[{time_log}] {download} {upload}"
+        return SpeedStatusObj(current_time, upload, download)
 
     @staticmethod
     def _speed_test():

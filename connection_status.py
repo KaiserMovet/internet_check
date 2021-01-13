@@ -2,26 +2,23 @@ import requests
 from datetime import datetime
 
 
+class ConnectionStatusObj():
+    DATABASE_NAME = 'internet_check_internetstatus'
+    FIELDS = ['change_time', 'status']
+
+    def __init__(self, date, status, id=None):
+        self.date = date
+        self.status = status
+
+    def get_tuple(self):
+        return (self.date.strftime("%Y-%m-%d - %H:%M:%S"), self.status)
+
+
 class ConnectionStatus():
 
-    TIME_STR = "%Y.%m.%d - %H:%M:%S"
-    HAS_CONNECTION_STR = "There is connection"
-    HAS_NO_CONNECTION_STR = "There is no connection"
-
-    def __init__(self, target, log_file):
+    def __init__(self, target, db):
         self.target = target
-        self.log_file = log_file
-
-        # generate first entry
-        self.last_time = datetime.now()
-        self.last_status = self._check_connection()
-        start_entry = self._generate_entry(
-            self.last_status, self.last_time)
-        self._save_info(start_entry)
-        # generate entry, which will be updated
-        entry = self._generate_entry(
-            self.last_status, self.last_time)
-        self._save_info(entry)
+        self.db = db
 
     def loop(self, current_time):
         """
@@ -29,26 +26,14 @@ class ConnectionStatus():
         """
         current_status = self._check_connection()
         entry = self._generate_entry(
-            self.last_status, current_time)
-        self._update_info(entry)
+            current_status, current_time)
+        self._save_info(entry)
 
-        # if status was changed
-        if self.last_status != current_status:
-            entry = self._generate_entry(
-                current_status, current_time)
-            self._save_info(entry)
-            self.last_time = current_time
-            self.last_status = current_status
         return current_status
 
-    @classmethod
-    def _generate_entry(cls, has_connection, current_time):
-        time_log = current_time.strftime(cls.TIME_STR)
-        if has_connection:
-            has_connection_log = cls.HAS_CONNECTION_STR
-        else:
-            has_connection_log = cls.HAS_NO_CONNECTION_STR
-        return F"[{time_log}] {has_connection_log}"
+    @staticmethod
+    def _generate_entry(has_connection, current_time):
+        return ConnectionStatusObj(current_time, has_connection)
 
     def _check_connection(self):
         try:
@@ -58,13 +43,10 @@ class ConnectionStatus():
             cur_status = False
         return cur_status
 
-    def _save_info(self, text):
-        with open(self.log_file, 'a') as file:
-            file.writelines([F'{text}\n'])
-
-    def _update_info(self, text):
-        with open(self.log_file, 'r') as file:
-            all_lines = file.readlines()
-        all_lines[-1] = F'{text}\n'
-        with open(self.log_file, 'w') as file:
-            file.writelines(all_lines)
+    def _save_info(self, entry):
+        result = self.db.get_last_entry(
+            ConnectionStatusObj.DATABASE_NAME, ConnectionStatusObj.FIELDS[0])
+        if not result or result[0][2] != entry.status:
+            self.db.save(entry)
+        else:
+            self.db.update_last_entry(entry, ConnectionStatusObj.FIELDS[0])

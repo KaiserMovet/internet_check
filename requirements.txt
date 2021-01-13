@@ -1,1 +1,4 @@
 speedtest-cli
+mysql-connector-python
+requests
+PyYAML

@@ -1,20 +1,20 @@
-from datetime import datetime
-import requests
 import time
-from speed_status import SpeedStatus
+from datetime import datetime
+from speed_status import SpeedStatus, SpeedStatusObj
 from connection_status import ConnectionStatus
+from internet_speed_cleen import InternetSpeedClean
+from database import DataBase
+import sys
 
 TARGET_ADDRESS = "http://google.com"
-INTERVAL_STEP = 300
-SPEED_CHECK_STEP = 3
-LOG_FILE = 'log.txt'
-SPEED_LOG_FILE = 'speed_log.txt'
+INTERVAL_STEP = 5
+SPEED_CHECK_STEP = 12
 
 
-def main():
-
-    connection_status = ConnectionStatus(TARGET_ADDRESS, LOG_FILE)
-    speed_status = SpeedStatus(SPEED_LOG_FILE)
+def loop():
+    db = DataBase()
+    connection_status = ConnectionStatus(TARGET_ADDRESS, db)
+    speed_status = SpeedStatus(db)
     index = -1
     while True:
         current_time = datetime.now()
@@ -26,6 +26,41 @@ def main():
             else:
                 speed_status.push_empty_entry(current_time)
         time.sleep(INTERVAL_STEP)
+
+
+def clean():
+    db = DataBase()
+    cleaner = InternetSpeedClean(db)
+    cleaner.clean()
+
+
+def load_from_file():
+    db = DataBase()
+    file_name = sys.argv[2]
+    obj_to_save = []
+    with open(file_name, 'r') as f:
+        lines = f.readlines()
+    for line in lines:
+        if not line:
+            continue
+        splitted_lines = line.split()
+        download = float(splitted_lines[3])
+        upload = float(splitted_lines[4])
+        date_str = " ".join(splitted_lines[0:3])[1:-1]
+        date = datetime.strptime(
+            date_str, '%Y.%m.%d - %H:%M:%S')
+        obj_to_save.append(SpeedStatusObj(date, upload, download))
+    db.save_multiple(obj_to_save)
+
+
+def main():
+
+    if sys.argv[1] == "loop":
+        loop()
+    elif sys.argv[1] == "clean":
+        clean()
+    elif sys.argv[1] == "load":
+        load_from_file()
 
 
 if __name__ == "__main__":
