@@ -15,7 +15,6 @@ class InternetStatusClean:
 
     def clean(self):
         all_obj = self.db.getAllConnectionStatus()
-        print(all_obj)
         new_obj = []
         new_obj.append(all_obj[0])
         last_status = all_obj[0].status
