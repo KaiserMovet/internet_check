@@ -32,8 +32,8 @@ def loop():
 
 def clean():
     db = DataBase()
-    # cleaner = InternetSpeedClean(db)
-    # cleaner.clean()
+    cleaner = InternetSpeedClean(db)
+    cleaner.clean()
     cleaner = InternetStatusClean(db)
     cleaner.clean()
 
