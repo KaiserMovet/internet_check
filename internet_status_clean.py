@@ -17,12 +17,11 @@ class InternetStatusClean:
         all_obj = self.db.getAllConnectionStatus()
         new_obj = []
         new_obj.append(all_obj[0])
-        last_status = all_obj[0].status
-        last_date = all_obj[0].date
-        for obj in all_obj[1:]:
-            if obj.status != last_status and \
-               (obj.date - last_date).total_seconds() / 60 > 10:
-                last_status = obj.status
-                last_date = obj.date
+        for i, obj in enumerate(all_obj[1:-1], 1):
+            next_obj = all_obj[i + 1]
+            last_obj = new_obj[-1]
+            if obj.status != next_obj.status and \
+                    (obj.date - last_obj.date).total_seconds() / 60 > 10:
                 new_obj.append(obj)
+        new_obj.append(all_obj[-1])
         self._save_to_db(new_obj)
