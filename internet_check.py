@@ -65,6 +65,7 @@ def load_from_file():
                 date_str, '%Y.%m.%d - %H:%M:%S')
             status = bool("no" in line)
             obj_to_save.append(ConnectionStatusObj(date, status))
+        db.save_multiple(obj_to_save)
 
 
 def main():
